@@ -1,5 +1,10 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  Ctx,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
 import { CreateOrderDto } from 'src/modules/order/dto';
 import { OrderService } from 'src/modules/order/order.service';
 
@@ -8,10 +13,17 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @MessagePattern({ cmd: 'create-order' })
-  async createOrder(@Payload() data: CreateOrderDto) {
+  async createOrder(
+    @Payload() data: CreateOrderDto,
+    @Ctx() context: RmqContext,
+  ) {
     console.log('data', data);
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
     await this.processOrder();
     console.log('done');
+    channel.ack(originalMsg);
     return true;
   }
 

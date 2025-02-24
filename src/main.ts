@@ -21,7 +21,8 @@ async function bootstrap() {
         queueOptions: {
           durable: true,
         },
-        prefetchCount: 1, // 🚀 Controls how many orders are processed at a time
+        noAck: false,
+        prefetchCount: 2, // 🚀 Controls how many orders are processed at a time
       },
     });
 
